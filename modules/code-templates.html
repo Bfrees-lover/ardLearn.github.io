@@ -75,6 +75,170 @@ void loop() {
 }
             </code></pre>
         </div>
+
+        <div class="template-card">
+            <h2>Сервопривод</h2>
+            <p>Управление сервоприводом</p>
+            <pre><code class="language-cpp">
+#include <Servo.h>
+
+Servo myservo;
+int pos = 0;
+
+void setup() {
+    myservo.attach(9);  // Подключаем сервопривод к пину 9
+}
+
+void loop() {
+    // Поворот от 0 до 180 градусов
+    for (pos = 0; pos <= 180; pos++) {
+        myservo.write(pos);
+        delay(15);
+    }
+    // Поворот от 180 до 0 градусов
+    for (pos = 180; pos >= 0; pos--) {
+        myservo.write(pos);
+        delay(15);
+    }
+}
+            </code></pre>
+        </div>
+
+        <div class="template-card">
+            <h2>LCD дисплей</h2>
+            <p>Вывод текста на LCD дисплей</p>
+            <pre><code class="language-cpp">
+#include <LiquidCrystal.h>
+
+// Инициализация пинов (RS, E, D4, D5, D6, D7)
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+void setup() {
+    lcd.begin(16, 2);  // Размер дисплея 16x2
+    lcd.print("Hello, Arduino!");
+}
+
+void loop() {
+    lcd.setCursor(0, 1);  // Переход на вторую строку
+    lcd.print("Time: ");
+    lcd.print(millis() / 1000);
+    delay(1000);
+}
+            </code></pre>
+        </div>
+
+        <div class="template-card">
+            <h2>Ультразвуковой датчик расстояния</h2>
+            <p>Измерение расстояния с помощью HC-SR04</p>
+            <pre><code class="language-cpp">
+const int trigPin = 9;
+const int echoPin = 10;
+
+void setup() {
+    Serial.begin(9600);
+    pinMode(trigPin, OUTPUT);
+    pinMode(echoPin, INPUT);
+}
+
+void loop() {
+    // Отправка ультразвукового сигнала
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+    
+    // Получение времени отклика
+    long duration = pulseIn(echoPin, HIGH);
+    
+    // Расчет расстояния
+    float distance = duration * 0.034 / 2;
+    
+    Serial.print("Расстояние: ");
+    Serial.print(distance);
+    Serial.println(" см");
+    
+    delay(500);
+}
+            </code></pre>
+        </div>
+
+        <div class="template-card">
+            <h2>RGB светодиод</h2>
+            <p>Управление RGB светодиодом</p>
+            <pre><code class="language-cpp">
+const int redPin = 11;
+const int greenPin = 10;
+const int bluePin = 9;
+
+void setup() {
+    pinMode(redPin, OUTPUT);
+    pinMode(greenPin, OUTPUT);
+    pinMode(bluePin, OUTPUT);
+}
+
+void loop() {
+    // Красный
+    setColor(255, 0, 0);
+    delay(1000);
+    
+    // Зеленый
+    setColor(0, 255, 0);
+    delay(1000);
+    
+    // Синий
+    setColor(0, 0, 255);
+    delay(1000);
+    
+    // Фиолетовый
+    setColor(255, 0, 255);
+    delay(1000);
+}
+
+void setColor(int red, int green, int blue) {
+    analogWrite(redPin, red);
+    analogWrite(greenPin, green);
+    analogWrite(bluePin, blue);
+}
+            </code></pre>
+        </div>
+
+        <div class="template-card">
+            <h2>Датчик температуры и влажности DHT11</h2>
+            <p>Считывание температуры и влажности</p>
+            <pre><code class="language-cpp">
+#include <DHT.h>
+
+#define DHTPIN 2
+#define DHTTYPE DHT11
+
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+    Serial.begin(9600);
+    dht.begin();
+}
+
+void loop() {
+    delay(2000); // Ждем 2 секунды между измерениями
+    
+    float h = dht.readHumidity();
+    float t = dht.readTemperature();
+    
+    if (isnan(h) || isnan(t)) {
+        Serial.println("Ошибка чтения датчика!");
+        return;
+    }
+    
+    Serial.print("Влажность: ");
+    Serial.print(h);
+    Serial.print("%\t");
+    Serial.print("Температура: ");
+    Serial.print(t);
+    Serial.println("°C");
+}
+            </code></pre>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
