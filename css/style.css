@@ -196,25 +196,33 @@ body {
     border: 1px solid #ddd;
     border-radius: 10px;
     overflow: hidden;
-} 
+}
+
 /* Добавьте этот CSS в ваш файл стилей (css/style.css) */
 .lightning {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 50px; /* Установите нужный размер */
-    height: auto;
-    background-image: url('lightning.png'); /* Путь к изображению молнии */
+    width: 30px;
+    height: 30px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23FFD700"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>');
     background-size: contain;
     background-repeat: no-repeat;
-    animation: jump 1s infinite;
+    cursor: pointer;
 }
 
-@keyframes jump {
-    0%, 100% {
+.bounce {
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
         transform: translateY(0);
     }
-    50% {
-        transform: translateY(-10px); /* Высота прыжка */
+    40% {
+        transform: translateY(-15px);
+    }
+    60% {
+        transform: translateY(-7px);
     }
 }
