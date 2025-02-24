@@ -6,6 +6,7 @@
     <title>Программирование Arduino</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-okaidia.min.css" rel="stylesheet" />
     <style>
         * {
             margin: 0;
@@ -89,152 +90,203 @@
             border-left: 4px solid #4caf50;
             margin: 10px 0;
         }
+
+        pre[class*="language-"] {
+            padding: 1.5em;
+            margin: 1em 0;
+            font-size: 16px;
+            border-radius: 8px;
+            background: #e8e8e8 !important;
+            border: 1px solid #ddd;
+        }
+        
+        code[class*="language-"] {
+            text-shadow: none;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            line-height: 1.5;
+            color: #333 !important;
+        }
+
+        /* Arduino IDE-like syntax highlighting */
+        .token.keyword {
+            color: #00979C !important;
+        }
+
+        .token.function {
+            color: #D35400 !important;
+        }
+
+        .token.number {
+            color: #00979C !important;
+        }
+
+        .token.comment {
+            color: #757575 !important;
+        }
+
+        .token.string {
+            color: #7F8C8D !important;
+        }
+
+        .token.preprocessor {
+            color: #728E00 !important;
+        }
+
+        .token.constant {
+            color: #00979C !important;
+        }
+
+        .token.operator {
+            color: #434F54 !important;
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        section {
+            margin-bottom: 40px;
+        }
     </style>
 </head>
 <body>
     <header class="header">
+        <a href="../index.html" class="back-button">← Назад</a>
         <h1>Программирование Arduino</h1>
+        <p>Основы программирования на C++ для Arduino</p>
     </header>
 
     <div class="content">
         <a href="../index.html" class="home-btn">На главную</a>
 
-        <div class="section">
-            <h2>Основы языка Arduino (C++)</h2>
-            <p>Arduino использует язык программирования, основанный на C++. Каждая программа должна содержать как минимум две функции:</p>
-            <div class="code-block">
-                <pre>
-void setup() {
-    // Код здесь выполняется один раз при запуске
-}
-
-void loop() {
-    // Код здесь выполняется циклически
-}</pre>
-            </div>
-            <div class="tip">
-                <strong>Совет:</strong> setup() используется для инициализации, а loop() для основной логики программы.
-            </div>
-        </div>
-
-        <div class="section">
+        <section>
             <h2>Переменные и типы данных</h2>
-            <p>Основные типы данных в Arduino:</p>
+            <p>Основные типы данных и их использование:</p>
+            
             <div class="code-block">
-                <pre>
-// Целые числа
-int number = 42;           // -32768 до 32767
-long bigNumber = 100000;   // большие числа
+                <h3>Примеры объявления переменных</h3>
+                <pre class="language-cpp"><code>// Целочисленные типы
+int counter = 0;          // -32768 до 32767
+byte temperature = 25;    // 0 до 255
+long bigNumber = 50000;   // большие числа
 
-// Дробные числа
-float temperature = 25.5;  // числа с плавающей точкой
+// Числа с плавающей точкой
+float voltage = 5.5;
+double pi = 3.14159265359;
 
 // Логический тип
-boolean isOn = true;      // true или false
+boolean isOn = true;
 
-// Символы
-char letter = 'A';        // одиночный символ
-
-// Константы
-const int LED_PIN = 13;   // значение нельзя изменить</pre>
+// Символы и строки
+char symbol = 'A';
+String message = "Hello Arduino";</code></pre>
             </div>
-        </div>
 
-        <div class="section">
             <h2>Условные операторы</h2>
-            <p>Управление потоком программы:</p>
+            <p>Использование условных операторов if-else:</p>
+            
             <div class="code-block">
-                <pre>
-// if-else
-if (temperature > 25) {
-    digitalWrite(FAN_PIN, HIGH);
+                <h3>Примеры условий</h3>
+                <pre class="language-cpp"><code>int sensorValue = analogRead(A0);
+
+// Простое условие
+if (sensorValue > 500) {
+    digitalWrite(13, HIGH);
 } else {
-    digitalWrite(FAN_PIN, LOW);
+    digitalWrite(13, LOW);
 }
 
-// switch-case
-switch (sensorValue) {
-    case 1:
-        // действие 1
-        break;
-    case 2:
-        // действие 2
-        break;
-    default:
-        // действие по умолчанию
-}</pre>
+// Множественные условия
+if (sensorValue < 200) {
+    // Низкий уровень
+    digitalWrite(2, HIGH);
+} else if (sensorValue < 800) {
+    // Средний уровень
+    digitalWrite(3, HIGH);
+} else {
+    // Высокий уровень
+    digitalWrite(4, HIGH);
+}</code></pre>
             </div>
-        </div>
 
-        <div class="section">
             <h2>Циклы</h2>
             <p>Различные типы циклов:</p>
+            
             <div class="code-block">
-                <pre>
-// for цикл
-for (int i = 0; i < 5; i++) {
-    digitalWrite(LED_PIN, HIGH);
-    delay(1000);
-    digitalWrite(LED_PIN, LOW);
-    delay(1000);
+                <h3>Примеры циклов</h3>
+                <pre class="language-cpp"><code>// Цикл for
+for (int i = 0; i < 10; i++) {
+    digitalWrite(ledPin, HIGH);
+    delay(100);
+    digitalWrite(ledPin, LOW);
+    delay(100);
 }
 
-// while цикл
-while (digitalRead(BUTTON_PIN) == HIGH) {
-    // выполнять, пока кнопка нажата
+// Цикл while
+int count = 0;
+while (count < 5) {
+    digitalWrite(ledPin, HIGH);
+    delay(1000);
+    digitalWrite(ledPin, LOW);
+    delay(1000);
+    count++;
 }
 
-// do-while цикл
+// Цикл do-while
 do {
-    // выполнится хотя бы раз
-} while (condition);</pre>
+    sensorValue = analogRead(A0);
+    delay(100);
+} while (sensorValue > 100);</code></pre>
             </div>
-        </div>
 
-        <div class="section">
             <h2>Функции</h2>
-            <p>Создание собственных функций:</p>
+            <p>Создание и использование пользовательских функций:</p>
+            
             <div class="code-block">
-                <pre>
-// Функция без возвращаемого значения
-void blinkLED(int times) {
+                <h3>Примеры функций</h3>
+                <pre class="language-cpp"><code>// Функция без параметров и возвращаемого значения
+void blinkLED() {
+    digitalWrite(13, HIGH);
+    delay(1000);
+    digitalWrite(13, LOW);
+    delay(1000);
+}
+
+// Функция с параметрами
+void blinkTimes(int pin, int times) {
     for (int i = 0; i < times; i++) {
-        digitalWrite(LED_PIN, HIGH);
-        delay(1000);
-        digitalWrite(LED_PIN, LOW);
-        delay(1000);
+        digitalWrite(pin, HIGH);
+        delay(500);
+        digitalWrite(pin, LOW);
+        delay(500);
     }
 }
 
 // Функция с возвращаемым значением
-float readTemperature() {
-    int sensorValue = analogRead(TEMP_PIN);
-    float temperature = (sensorValue * 5.0 / 1024.0) * 100;
-    return temperature;
-}</pre>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>Массивы</h2>
-            <p>Работа с массивами данных:</p>
-            <div class="code-block">
-                <pre>
-// Объявление массива
-int ledPins[] = {2, 3, 4, 5, 6};
-
-// Перебор массива
-for (int i = 0; i < 5; i++) {
-    pinMode(ledPins[i], OUTPUT);
+float readVoltage(int pin) {
+    int sensorValue = analogRead(pin);
+    float voltage = sensorValue * (5.0 / 1023.0);
+    return voltage;
 }
 
-// Двумерный массив
-int matrix[2][3] = {
-    {1, 2, 3},
-    {4, 5, 6}
-};</pre>
+void setup() {
+    pinMode(13, OUTPUT);
+    Serial.begin(9600);
+}
+
+void loop() {
+    blinkLED();  // Вызов простой функции
+    blinkTimes(13, 3);  // Вызов функции с параметрами
+    
+    float voltage = readVoltage(A0);  // Получение значения из функции
+    Serial.println(voltage);
+    
+    delay(1000);
+}</code></pre>
             </div>
-        </div>
+        </section>
 
         <div class="test-container">
             <h2>Проверьте свои знания</h2>
@@ -287,6 +339,10 @@ int matrix[2][3] = {
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-cpp.min.js"></script>
     <script>
         function checkAnswers() {
             const correctAnswers = {
@@ -307,6 +363,10 @@ int matrix[2][3] = {
 
             alert(`Ваш результат: ${score} из ${total} правильных ответов`);
         }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            Prism.highlightAll();
+        });
     </script>
 </body>
 </html> 

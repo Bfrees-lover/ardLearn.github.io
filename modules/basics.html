@@ -6,85 +6,192 @@
     <title>Основы Arduino</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-okaidia.min.css" rel="stylesheet" />
+    <style>
+        pre[class*="language-"] {
+            padding: 1.5em;
+            margin: 1em 0;
+            font-size: 16px;
+            border-radius: 8px;
+            background: #e8e8e8 !important;
+            border: 1px solid #ddd;
+        }
+        
+        code[class*="language-"] {
+            text-shadow: none;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            line-height: 1.5;
+            color: #333 !important;
+        }
+
+        /* Arduino IDE-like syntax highlighting */
+        .token.keyword {
+            color: #00979C !important;
+        }
+
+        .token.function {
+            color: #D35400 !important;
+        }
+
+        .token.number {
+            color: #00979C !important;
+        }
+
+        .token.comment {
+            color: #757575 !important;
+        }
+
+        .token.string {
+            color: #7F8C8D !important;
+        }
+
+        .token.preprocessor {
+            color: #728E00 !important;
+        }
+
+        .token.constant {
+            color: #00979C !important;
+        }
+
+        .token.operator {
+            color: #434F54 !important;
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        section {
+            margin-bottom: 40px;
+        }
+    </style>
 </head>
 <body>
     <header class="header">
+        <a href="../index.html" class="back-button">← Назад</a>
         <h1>Основы Arduino</h1>
+        <p>Базовые принципы работы с платформой</p>
     </header>
 
     <div class="content">
-        <a href="../index.html" class="home-btn">На главную</a>
+        <section>
+            <h2>Структура скетча</h2>
+            <p>Каждая программа Arduino должна содержать две основные функции:</p>
+            
+            <div class="code-block">
+                <h3>Базовая структура программы</h3>
+                <pre class="language-cpp"><code>void setup() {
+    // Код здесь выполняется один раз при запуске
+    pinMode(13, OUTPUT);    // Настройка пина 13 как выхода
+}
 
-        <div class="section">
-            <h2>Что такое Arduino?</h2>
-            <p>Arduino - это открытая электронная платформа, основанная на простом в использовании железе и программном обеспечении...</p>
-        </div>
-
-        <div class="section">
-            <h2>Компоненты платы Arduino</h2>
-            <p>Основные компоненты платы Arduino включают в себя микроконтроллер, пины ввода/вывода, USB-порт...</p>
-        </div>
-
-        <div class="section">
-            <h2>Среда разработки Arduino IDE</h2>
-            <p>Arduino IDE - это программное обеспечение для написания и загрузки кода на плату...</p>
-        </div>
-
-        <div class="test-container">
-            <h2>Проверьте свои знания</h2>
-            <div class="question">
-                <p>1. Arduino - это:</p>
-                <div class="options">
-                    <label>
-                        <input type="radio" name="q1" value="1"> Микроконтроллер
-                    </label>
-                    <label>
-                        <input type="radio" name="q1" value="2"> Открытая электронная платформа
-                    </label>
-                    <label>
-                        <input type="radio" name="q1" value="3"> Операционная система
-                    </label>
-                </div>
+void loop() {
+    // Код здесь выполняется циклически
+    digitalWrite(13, HIGH); // Включаем светодиод
+    delay(1000);           // Ждём 1 секунду
+    digitalWrite(13, LOW);  // Выключаем светодиод
+    delay(1000);           // Ждём 1 секунду
+}</code></pre>
             </div>
 
-            <div class="question">
-                <p>2. Arduino IDE используется для:</p>
-                <div class="options">
-                    <label>
-                        <input type="radio" name="q2" value="1"> Проектирования печатных плат
-                    </label>
-                    <label>
-                        <input type="radio" name="q2" value="2"> Написания и загрузки кода на плату
-                    </label>
-                    <label>
-                        <input type="radio" name="q2" value="3"> Создания 3D-моделей
-                    </label>
-                </div>
+            <h2>Цифровые входы и выходы</h2>
+            <p>Работа с цифровыми пинами:</p>
+            
+            <div class="code-block">
+                <h3>Управление цифровыми пинами</h3>
+                <pre class="language-cpp"><code>const int buttonPin = 2;  // Пин кнопки
+const int ledPin = 13;    // Пин светодиода
+
+void setup() {
+    pinMode(ledPin, OUTPUT);      // Светодиод - выход
+    pinMode(buttonPin, INPUT);    // Кнопка - вход
+}
+
+void loop() {
+    // Читаем состояние кнопки
+    int buttonState = digitalRead(buttonPin);
+    
+    // Если кнопка нажата - включаем светодиод
+    if (buttonState == HIGH) {
+        digitalWrite(ledPin, HIGH);
+    } else {
+        digitalWrite(ledPin, LOW);
+    }
+}</code></pre>
             </div>
 
-            <button class="submit-btn" onclick="checkAnswers()">Проверить ответы</button>
-        </div>
+            <h2>Аналоговые входы</h2>
+            <p>Чтение аналоговых значений:</p>
+            
+            <div class="code-block">
+                <h3>Работа с аналоговыми входами</h3>
+                <pre class="language-cpp"><code>const int analogPin = A0;  // Аналоговый вход
+const int ledPin = 9;     // ШИМ выход
+
+void setup() {
+    pinMode(ledPin, OUTPUT);
+    Serial.begin(9600);     // Инициализация Serial-порта
+}
+
+void loop() {
+    // Читаем значение с аналогового входа (0-1023)
+    int sensorValue = analogRead(analogPin);
+    
+    // Преобразуем значение для ШИМ (0-255)
+    int brightness = map(sensorValue, 0, 1023, 0, 255);
+    
+    // Устанавливаем яркость светодиода
+    analogWrite(ledPin, brightness);
+    
+    // Выводим значения в Serial-монитор
+    Serial.print("Sensor: ");
+    Serial.print(sensorValue);
+    Serial.print("\tBrightness: ");
+    Serial.println(brightness);
+    
+    delay(100);
+}</code></pre>
+            </div>
+
+            <h2>Последовательный порт</h2>
+            <p>Обмен данными через Serial порт:</p>
+            
+            <div class="code-block">
+                <h3>Работа с Serial портом</h3>
+                <pre class="language-cpp"><code>void setup() {
+    Serial.begin(9600);  // Установка скорости передачи данных
+}
+
+void loop() {
+    // Отправка данных
+    Serial.println("Hello, Arduino!");
+    
+    // Проверка наличия входящих данных
+    if (Serial.available() > 0) {
+        // Чтение входящих данных
+        char incomingByte = Serial.read();
+        
+        // Эхо полученных данных
+        Serial.print("Получено: ");
+        Serial.println(incomingByte);
+    }
+    
+    delay(1000);
+}</code></pre>
+            </div>
+        </section>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-cpp.min.js"></script>
     <script>
-        function checkAnswers() {
-            const correctAnswers = {
-                q1: "2",
-                q2: "2"
-            };
-
-            let score = 0;
-            let total = Object.keys(correctAnswers).length;
-
-            for (let question in correctAnswers) {
-                const selected = document.querySelector(`input[name="${question}"]:checked`);
-                if (selected && selected.value === correctAnswers[question]) {
-                    score++;
-                }
-            }
-
-            alert(`Ваш результат: ${score} из ${total} правильных ответов`);
-        }
+        document.addEventListener('DOMContentLoaded', (event) => {
+            Prism.highlightAll();
+        });
     </script>
 </body>
 </html> 

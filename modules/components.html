@@ -6,148 +6,237 @@
     <title>Компоненты Arduino</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-okaidia.min.css" rel="stylesheet" />
+    <style>
+        pre[class*="language-"] {
+            padding: 1.5em;
+            margin: 1em 0;
+            font-size: 16px;
+            border-radius: 8px;
+            background: #e8e8e8 !important;
+            border: 1px solid #ddd;
+        }
+        
+        code[class*="language-"] {
+            text-shadow: none;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            line-height: 1.5;
+            color: #333 !important;
+        }
+
+        /* Arduino IDE-like syntax highlighting */
+        .token.keyword {
+            color: #00979C !important;
+        }
+
+        .token.function {
+            color: #D35400 !important;
+        }
+
+        .token.number {
+            color: #00979C !important;
+        }
+
+        .token.comment {
+            color: #757575 !important;
+        }
+
+        .token.string {
+            color: #7F8C8D !important;
+        }
+
+        .token.preprocessor {
+            color: #728E00 !important;
+        }
+
+        .token.constant {
+            color: #00979C !important;
+        }
+
+        .token.operator {
+            color: #434F54 !important;
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        section {
+            margin-bottom: 40px;
+        }
+    </style>
 </head>
 <body>
     <header class="header">
+        <a href="../index.html" class="back-button">← Назад</a>
         <h1>Компоненты Arduino</h1>
+        <p>Работа с различными компонентами и модулями</p>
     </header>
 
     <div class="content">
-        <a href="../index.html" class="home-btn">На главную</a>
-
-        <div class="section">
-            <h2>Платы Arduino</h2>
+        <section>
+            <h2>Модуль часов реального времени DS3231</h2>
+            <p>Работа с часами реального времени:</p>
             
-            <div class="component-card">
-                <h3>Arduino UNO</h3>
-                <p>Самая популярная плата для начинающих.</p>
-                <div class="component-specs">
-                    <strong>Характеристики:</strong>
-                    <ul>
-                        <li>Микроконтроллер: ATmega328P</li>
-                        <li>Рабочее напряжение: 5В</li>
-                        <li>Цифровые пины: 14 (6 с ШИМ)</li>
-                        <li>Аналоговые входы: 6</li>
-                        <li>Flash память: 32 KB</li>
-                    </ul>
-                </div>
+            <div class="code-block">
+                <h3>Чтение и установка времени</h3>
+                <pre class="language-cpp"><code>#include <Wire.h>
+#include <RTClib.h>
+
+RTC_DS3231 rtc;
+
+void setup() {
+    Serial.begin(9600);
+    
+    if (!rtc.begin()) {
+        Serial.println("Не удалось найти RTC");
+        while (1);
+    }
+
+    // Установка времени (только при первой загрузке)
+    // rtc.adjust(DateTime(2023, 12, 31, 23, 59, 50));
+}
+
+void loop() {
+    DateTime now = rtc.now();
+    
+    Serial.print(now.year(), DEC);
+    Serial.print('/');
+    Serial.print(now.month(), DEC);
+    Serial.print('/');
+    Serial.print(now.day(), DEC);
+    Serial.print(" ");
+    Serial.print(now.hour(), DEC);
+    Serial.print(':');
+    Serial.print(now.minute(), DEC);
+    Serial.print(':');
+    Serial.println(now.second(), DEC);
+    
+    delay(1000);
+}</code></pre>
             </div>
 
-            <div class="component-card">
-                <h3>Arduino Nano</h3>
-                <p>Компактная версия Arduino UNO.</p>
-                <div class="component-specs">
-                    <strong>Характеристики:</strong>
-                    <ul>
-                        <li>Микроконтроллер: ATmega328P</li>
-                        <li>Рабочее напряжение: 5В</li>
-                        <li>Размеры: 18 x 45 мм</li>
-                        <li>Цифровые пины: 14 (6 с ШИМ)</li>
-                        <li>Аналоговые входы: 8</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>Датчики</h2>
+            <h2>Модуль SD карты</h2>
+            <p>Запись и чтение данных с SD карты:</p>
             
-            <div class="component-card">
-                <h3>DHT11/DHT22</h3>
-                <p>Датчики температуры и влажности.</p>
-                <div class="component-specs">
-                    <strong>Характеристики DHT11:</strong>
-                    <ul>
-                        <li>Диапазон температур: 0-50°C</li>
-                        <li>Точность: ±2°C</li>
-                        <li>Влажность: 20-90%</li>
-                        <li>Питание: 3-5.5В</li>
-                    </ul>
-                </div>
+            <div class="code-block">
+                <h3>Работа с файлами на SD карте</h3>
+                <pre class="language-cpp"><code>#include <SPI.h>
+#include <SD.h>
+
+const int chipSelect = 10;
+File dataFile;
+
+void setup() {
+    Serial.begin(9600);
+    
+    if (!SD.begin(chipSelect)) {
+        Serial.println("Ошибка инициализации SD карты!");
+        return;
+    }
+    Serial.println("SD карта инициализирована.");
+
+    // Запись данных
+    dataFile = SD.open("data.txt", FILE_WRITE);
+    if (dataFile) {
+        dataFile.println("Время,Температура");
+        dataFile.close();
+    }
+}
+
+void loop() {
+    // Запись новых данных
+    dataFile = SD.open("data.txt", FILE_WRITE);
+    if (dataFile) {
+        dataFile.print(millis());
+        dataFile.print(",");
+        dataFile.println(analogRead(A0));
+        dataFile.close();
+    }
+    
+    delay(1000);
+}</code></pre>
             </div>
 
-            <div class="component-card">
-                <h3>HC-SR04</h3>
-                <p>Ультразвуковой датчик расстояния.</p>
-                <div class="component-specs">
-                    <strong>Характеристики:</strong>
-                    <ul>
-                        <li>Диапазон измерения: 2-400 см</li>
-                        <li>Точность: 3 мм</li>
-                        <li>Угол измерения: 15°</li>
-                        <li>Питание: 5В</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>Исполнительные устройства</h2>
+            <h2>Модуль Bluetooth HC-05</h2>
+            <p>Беспроводная связь через Bluetooth:</p>
             
-            <div class="component-card">
-                <h3>Сервопривод SG90</h3>
-                <p>Малый сервопривод для проектов робототехники.</p>
-                <div class="component-specs">
-                    <strong>Характеристики:</strong>
-                    <ul>
-                        <li>Угол поворота: 180°</li>
-                        <li>Крутящий момент: 1.8 кг⋅см</li>
-                        <li>Скорость: 0.1 сек/60°</li>
-                        <li>Питание: 4.8-6В</li>
-                    </ul>
-                </div>
+            <div class="code-block">
+                <h3>Обмен данными через Bluetooth</h3>
+                <pre class="language-cpp"><code>#include <SoftwareSerial.h>
+
+SoftwareSerial bluetooth(2, 3); // RX, TX
+
+void setup() {
+    Serial.begin(9600);
+    bluetooth.begin(9600);
+}
+
+void loop() {
+    // Отправка данных на устройство
+    if (Serial.available()) {
+        bluetooth.write(Serial.read());
+    }
+    
+    // Получение данных с устройства
+    if (bluetooth.available()) {
+        Serial.write(bluetooth.read());
+    }
+}</code></pre>
             </div>
 
-            <div class="component-card">
-                <h3>Шаговый двигатель 28BYJ-48</h3>
-                <p>Популярный шаговый двигатель с драйвером ULN2003.</p>
-                <div class="component-specs">
-                    <strong>Характеристики:</strong>
-                    <ul>
-                        <li>Напряжение: 5В</li>
-                        <li>Шагов на оборот: 2048</li>
-                        <li>4 фазы</li>
-                        <li>Редуктор 1:64</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>Дисплеи</h2>
+            <h2>Модуль RFID RC522</h2>
+            <p>Работа с RFID метками:</p>
             
-            <div class="component-card">
-                <h3>LCD 1602</h3>
-                <p>Символьный LCD дисплей.</p>
-                <div class="component-specs">
-                    <strong>Характеристики:</strong>
-                    <ul>
-                        <li>16 символов x 2 строки</li>
-                        <li>Интерфейс: I2C или параллельный</li>
-                        <li>Подсветка: синяя/зеленая</li>
-                        <li>Питание: 5В</li>
-                    </ul>
-                </div>
-            </div>
+            <div class="code-block">
+                <h3>Чтение RFID меток</h3>
+                <pre class="language-cpp"><code>#include <SPI.h>
+#include <MFRC522.h>
 
-            <div class="component-card">
-                <h3>OLED SSD1306</h3>
-                <p>Графический OLED дисплей.</p>
-                <div class="component-specs">
-                    <strong>Характеристики:</strong>
-                    <ul>
-                        <li>Разрешение: 128x64 пикселя</li>
-                        <li>Интерфейс: I2C/SPI</li>
-                        <li>Монохромный</li>
-                        <li>Питание: 3.3-5В</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+#define SS_PIN 10
+#define RST_PIN 9
 
-        <div class="tip">
-            <strong>Совет:</strong> При выборе компонентов всегда проверяйте их совместимость с вашей платой Arduino и требования к напряжению питания.
-        </div>
+MFRC522 rfid(SS_PIN, RST_PIN);
+
+void setup() {
+    Serial.begin(9600);
+    SPI.begin();
+    rfid.PCD_Init();
+}
+
+void loop() {
+    // Проверяем наличие новой карты
+    if (!rfid.PICC_IsNewCardPresent())
+        return;
+
+    // Читаем серийный номер карты
+    if (!rfid.PICC_ReadCardSerial())
+        return;
+
+    Serial.print("UID метки: ");
+    for (byte i = 0; i < rfid.uid.size; i++) {
+        Serial.print(rfid.uid.uidByte[i] < 0x10 ? " 0" : " ");
+        Serial.print(rfid.uid.uidByte[i], HEX);
+    }
+    Serial.println();
+
+    rfid.PICC_HaltA();
+    rfid.PCD_StopCrypto1();
+}</code></pre>
+            </div>
+        </section>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-cpp.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            Prism.highlightAll();
+        });
+    </script>
 </body>
 </html> 

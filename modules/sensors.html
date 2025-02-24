@@ -6,23 +6,86 @@
     <title>Сенсоры и датчики Arduino</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-okaidia.min.css" rel="stylesheet" />
+    <style>
+        pre[class*="language-"] {
+            padding: 1.5em;
+            margin: 1em 0;
+            font-size: 16px;
+            border-radius: 8px;
+            background: #e8e8e8 !important;
+            border: 1px solid #ddd;
+        }
+        
+        code[class*="language-"] {
+            text-shadow: none;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            line-height: 1.5;
+            color: #333 !important;
+        }
+
+        /* Arduino IDE-like syntax highlighting */
+        .token.keyword {
+            color: #00979C !important;
+        }
+
+        .token.function {
+            color: #D35400 !important;
+        }
+
+        .token.number {
+            color: #00979C !important;
+        }
+
+        .token.comment {
+            color: #757575 !important;
+        }
+
+        .token.string {
+            color: #7F8C8D !important;
+        }
+
+        .token.preprocessor {
+            color: #728E00 !important;
+        }
+
+        .token.constant {
+            color: #00979C !important;
+        }
+
+        .token.operator {
+            color: #434F54 !important;
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        section {
+            margin-bottom: 40px;
+        }
+    </style>
 </head>
 <body>
     <header class="header">
+        <a href="../index.html" class="back-button">← Назад</a>
         <h1>Сенсоры и датчики</h1>
+        <p>Работа с различными типами датчиков</p>
     </header>
 
     <div class="content">
-        <a href="../index.html" class="home-btn">На главную</a>
-
-        <div class="section">
+        <section>
             <h2>Датчик температуры и влажности DHT11/DHT22</h2>
-            <p>DHT11 и DHT22 - популярные цифровые датчики для измерения температуры и влажности воздуха.</p>
+            <p>Пример работы с датчиком температуры и влажности:</p>
+            
             <div class="code-block">
-                <pre>
-#include "DHT.h"
-#define DHTPIN 2      // Пин подключения датчика
-#define DHTTYPE DHT11 // Тип датчика (DHT11 или DHT22)
+                <h3>Чтение температуры и влажности</h3>
+                <pre class="language-cpp"><code>#include <DHT.h>
+
+#define DHTPIN 2        // Пин подключения датчика
+#define DHTTYPE DHT11   // Тип датчика (DHT11 или DHT22)
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -32,27 +95,33 @@ void setup() {
 }
 
 void loop() {
-    float h = dht.readHumidity();    // Чтение влажности
-    float t = dht.readTemperature(); // Чтение температуры
-
+    delay(2000);  // Задержка между измерениями
+    
+    float h = dht.readHumidity();     // Чтение влажности
+    float t = dht.readTemperature();  // Чтение температуры
+    
+    // Проверка корректности данных
+    if (isnan(h) || isnan(t)) {
+        Serial.println("Ошибка чтения датчика!");
+        return;
+    }
+    
     Serial.print("Влажность: ");
     Serial.print(h);
-    Serial.print("%, Температура: ");
+    Serial.print("%\t");
+    Serial.print("Температура: ");
     Serial.print(t);
     Serial.println("°C");
-    
-    delay(2000);
-}</pre>
+}</code></pre>
             </div>
-        </div>
 
-        <div class="section">
             <h2>Ультразвуковой датчик расстояния HC-SR04</h2>
-            <p>HC-SR04 позволяет измерять расстояние до объектов с помощью ультразвуковых волн.</p>
+            <p>Измерение расстояния с помощью ультразвукового датчика:</p>
+            
             <div class="code-block">
-                <pre>
-const int trigPin = 9;
-const int echoPin = 10;
+                <h3>Измерение расстояния</h3>
+                <pre class="language-cpp"><code>const int trigPin = 9;   // Пин Trig
+const int echoPin = 10;  // Пин Echo
 
 void setup() {
     Serial.begin(9600);
@@ -61,13 +130,17 @@ void setup() {
 }
 
 void loop() {
+    // Отправка ультразвукового импульса
     digitalWrite(trigPin, LOW);
     delayMicroseconds(2);
     digitalWrite(trigPin, HIGH);
     delayMicroseconds(10);
     digitalWrite(trigPin, LOW);
     
+    // Измерение длительности эха
     long duration = pulseIn(echoPin, HIGH);
+    
+    // Расчет расстояния
     float distance = duration * 0.034 / 2;
     
     Serial.print("Расстояние: ");
@@ -75,107 +148,85 @@ void loop() {
     Serial.println(" см");
     
     delay(500);
-}</pre>
+}</code></pre>
             </div>
-        </div>
 
-        <div class="section">
             <h2>Датчик движения PIR HC-SR501</h2>
-            <p>PIR-датчик реагирует на движение, обнаруживая изменение инфракрасного излучения.</p>
+            <p>Обнаружение движения с помощью PIR датчика:</p>
+            
             <div class="code-block">
-                <pre>
-const int pirPin = 2;
-const int ledPin = 13;
+                <h3>Детектор движения</h3>
+                <pre class="language-cpp"><code>const int pirPin = 2;     // Пин датчика движения
+const int ledPin = 13;    // Пин светодиода
+int pirState = LOW;       // Начальное состояние датчика
 
 void setup() {
-    pinMode(pirPin, INPUT);
     pinMode(ledPin, OUTPUT);
+    pinMode(pirPin, INPUT);
     Serial.begin(9600);
 }
 
 void loop() {
-    if (digitalRead(pirPin) == HIGH) {
+    int val = digitalRead(pirPin);  // Чтение датчика
+    
+    if (val == HIGH) {
+        digitalWrite(ledPin, HIGH);  // Включаем светодиод
+        
+        if (pirState == LOW) {
+            Serial.println("Обнаружено движение!");
+            pirState = HIGH;
+        }
+    } else {
+        digitalWrite(ledPin, LOW);  // Выключаем светодиод
+        
+        if (pirState == HIGH) {
+            Serial.println("Движение прекратилось");
+            pirState = LOW;
+        }
+    }
+}</code></pre>
+            </div>
+
+            <h2>Фоторезистор</h2>
+            <p>Измерение уровня освещенности:</p>
+            
+            <div class="code-block">
+                <h3>Датчик освещенности</h3>
+                <pre class="language-cpp"><code>const int lightPin = A0;   // Пин фоторезистора
+const int ledPin = 9;     // Пин светодиода
+const int threshold = 500; // Пороговое значение освещенности
+
+void setup() {
+    Serial.begin(9600);
+    pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+    int lightLevel = analogRead(lightPin);
+    Serial.print("Уровень освещенности: ");
+    Serial.println(lightLevel);
+    
+    // Если темно - включаем светодиод
+    if (lightLevel < threshold) {
         digitalWrite(ledPin, HIGH);
-        Serial.println("Обнаружено движение!");
     } else {
         digitalWrite(ledPin, LOW);
     }
+    
     delay(100);
-}</pre>
+}</code></pre>
             </div>
-        </div>
-
-        <div class="test-container">
-            <h2>Проверьте свои знания</h2>
-            <div class="question">
-                <p>1. Какой датчик используется для измерения расстояния с помощью ультразвука?</p>
-                <div class="options">
-                    <label>
-                        <input type="radio" name="q1" value="1"> DHT11
-                    </label>
-                    <label>
-                        <input type="radio" name="q1" value="2"> HC-SR04
-                    </label>
-                    <label>
-                        <input type="radio" name="q1" value="3"> HC-SR501
-                    </label>
-                </div>
-            </div>
-
-            <div class="question">
-                <p>2. Что измеряет датчик DHT11?</p>
-                <div class="options">
-                    <label>
-                        <input type="radio" name="q2" value="1"> Только температуру
-                    </label>
-                    <label>
-                        <input type="radio" name="q2" value="2"> Температуру и влажность
-                    </label>
-                    <label>
-                        <input type="radio" name="q2" value="3"> Движение и температуру
-                    </label>
-                </div>
-            </div>
-
-            <div class="question">
-                <p>3. На каком принципе работает PIR-датчик?</p>
-                <div class="options">
-                    <label>
-                        <input type="radio" name="q3" value="1"> Ультразвуковые волны
-                    </label>
-                    <label>
-                        <input type="radio" name="q3" value="2"> Инфракрасное излучение
-                    </label>
-                    <label>
-                        <input type="radio" name="q3" value="3"> Электромагнитные волны
-                    </label>
-                </div>
-            </div>
-
-            <button class="submit-btn" onclick="checkAnswers()">Проверить ответы</button>
-        </div>
+        </section>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-cpp.min.js"></script>
     <script>
-        function checkAnswers() {
-            const correctAnswers = {
-                q1: "2",
-                q2: "2",
-                q3: "2"
-            };
-
-            let score = 0;
-            let total = Object.keys(correctAnswers).length;
-
-            for (let question in correctAnswers) {
-                const selected = document.querySelector(`input[name="${question}"]:checked`);
-                if (selected && selected.value === correctAnswers[question]) {
-                    score++;
-                }
-            }
-
-            alert(`Ваш результат: ${score} из ${total} правильных ответов`);
-        }
+        document.addEventListener('DOMContentLoaded', (event) => {
+            Prism.highlightAll();
+        });
     </script>
 </body>
 </html> 

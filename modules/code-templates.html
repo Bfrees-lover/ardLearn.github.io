@@ -6,242 +6,244 @@
     <title>Шаблоны кода Arduino</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-okaidia.min.css" rel="stylesheet" />
+    <style>
+        pre[class*="language-"] {
+            padding: 1.5em;
+            margin: 1em 0;
+            font-size: 16px;
+            border-radius: 8px;
+            background: #e8e8e8 !important;
+            border: 1px solid #ddd;
+        }
+        
+        code[class*="language-"] {
+            text-shadow: none;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            line-height: 1.5;
+            color: #333 !important;
+        }
+
+        /* Arduino IDE-like syntax highlighting */
+        .token.keyword {
+            color: #00979C !important;
+        }
+
+        .token.function {
+            color: #D35400 !important;
+        }
+
+        .token.number {
+            color: #00979C !important;
+        }
+
+        .token.comment {
+            color: #757575 !important;
+        }
+
+        .token.string {
+            color: #7F8C8D !important;
+        }
+
+        .token.preprocessor {
+            color: #728E00 !important;
+        }
+
+        .token.constant {
+            color: #00979C !important;
+        }
+
+        .token.operator {
+            color: #434F54 !important;
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        section {
+            margin-bottom: 40px;
+        }
+
+        .template-card {
+            background: #f8f9fa;
+            margin-bottom: 30px;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .template-card h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .template-card p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
     <header class="header">
         <a href="../index.html" class="back-button">← Назад</a>
-        <h1>Шаблоны кода Arduino</h1>
-        <p>Готовые примеры кода для типовых задач</p>
+        <h1>Шаблоны кода</h1>
+        <p>Готовые шаблоны для типовых задач</p>
     </header>
 
-    <div class="code-templates">
-        <div class="template-card">
-            <h2>Мигающий светодиод (Blink)</h2>
-            <p>Базовый пример работы со светодиодом</p>
-            <pre><code class="language-cpp">
+    <div class="content">
+        <section>
+            <div class="template-card">
+                <h2>Кнопка с защитой от дребезга</h2>
+                <p>Шаблон для работы с кнопкой, включая программную защиту от дребезга контактов:</p>
+                <pre class="language-cpp"><code>const int buttonPin = 2;     // Пин кнопки
+const int ledPin = 13;      // Пин светодиода
+
+int ledState = HIGH;         // Текущее состояние светодиода
+int buttonState;            // Текущее состояние кнопки
+int lastButtonState = LOW;   // Предыдущее состояние кнопки
+
+// Переменные для устранения дребезга
+unsigned long lastDebounceTime = 0;
+unsigned long debounceDelay = 50;    // Время дребезга (мс)
+
 void setup() {
-    pinMode(13, OUTPUT);    // Установка пина 13 как выход
+    pinMode(buttonPin, INPUT_PULLUP);
+    pinMode(ledPin, OUTPUT);
+    digitalWrite(ledPin, ledState);
 }
 
 void loop() {
-    digitalWrite(13, HIGH); // Включить светодиод
-    delay(1000);           // Ждать 1 секунду
-    digitalWrite(13, LOW);  // Выключить светодиод
-    delay(1000);           // Ждать 1 секунду
-}
-            </code></pre>
-        </div>
+    int reading = digitalRead(buttonPin);
 
-        <div class="template-card">
-            <h2>Кнопка и светодиод</h2>
-            <p>Управление светодиодом с помощью кнопки</p>
-            <pre><code class="language-cpp">
-const int buttonPin = 2;    // Пин кнопки
-const int ledPin = 13;      // Пин светодиода
-int buttonState = 0;        // Состояние кнопки
+    if (reading != lastButtonState) {
+        lastDebounceTime = millis();
+    }
+
+    if ((millis() - lastDebounceTime) > debounceDelay) {
+        if (reading != buttonState) {
+            buttonState = reading;
+            if (buttonState == LOW) {
+                ledState = !ledState;
+            }
+        }
+    }
+
+    digitalWrite(ledPin, ledState);
+    lastButtonState = reading;
+}</code></pre>
+            </div>
+
+            <div class="template-card">
+                <h2>Плавное изменение яркости светодиода</h2>
+                <p>Шаблон для плавного управления яркостью через ШИМ:</p>
+                <pre class="language-cpp"><code>const int ledPin = 9;    // Пин светодиода (PWM)
+const int fadeAmount = 5;  // Шаг изменения яркости
+int brightness = 0;        // Текущая яркость
 
 void setup() {
     pinMode(ledPin, OUTPUT);
-    pinMode(buttonPin, INPUT);
 }
 
 void loop() {
-    buttonState = digitalRead(buttonPin);
-    if (buttonState == HIGH) {
-        digitalWrite(ledPin, HIGH);
-    } else {
-        digitalWrite(ledPin, LOW);
-    }
-}
-            </code></pre>
-        </div>
+    // Устанавливаем яркость светодиода
+    analogWrite(ledPin, brightness);
 
-        <div class="template-card">
-            <h2>Аналоговое чтение</h2>
-            <p>Чтение данных с аналогового датчика</p>
-            <pre><code class="language-cpp">
-const int sensorPin = A0;   // Аналоговый пин датчика
-int sensorValue = 0;        // Значение с датчика
+    // Изменяем яркость
+    brightness = brightness + fadeAmount;
+
+    // Меняем направление при достижении пределов
+    if (brightness <= 0 || brightness >= 255) {
+        fadeAmount = -fadeAmount;
+    }
+
+    delay(30);  // Небольшая задержка
+}</code></pre>
+            </div>
+
+            <div class="template-card">
+                <h2>Чтение аналогового датчика с усреднением</h2>
+                <p>Шаблон для точного чтения аналогового сигнала с усреднением значений:</p>
+                <pre class="language-cpp"><code>const int sensorPin = A0;      // Аналоговый пин
+const int numReadings = 10;    // Количество измерений для усреднения
+
+int readings[numReadings];     // Массив для хранения измерений
+int readIndex = 0;            // Индекс текущего измерения
+int total = 0;                // Сумма измерений
+int average = 0;              // Среднее значение
 
 void setup() {
-    Serial.begin(9600);     // Инициализация Serial порта
+    Serial.begin(9600);
+    
+    // Инициализация массива
+    for (int i = 0; i < numReadings; i++) {
+        readings[i] = 0;
+    }
 }
 
 void loop() {
-    sensorValue = analogRead(sensorPin);
-    Serial.println(sensorValue);
+    // Вычитаем последнее значение
+    total = total - readings[readIndex];
+    
+    // Считываем новое значение
+    readings[readIndex] = analogRead(sensorPin);
+    
+    // Добавляем значение к сумме
+    total = total + readings[readIndex];
+    
+    // Переходим к следующей позиции
+    readIndex = readIndex + 1;
+
+    if (readIndex >= numReadings) {
+        readIndex = 0;
+    }
+
+    // Вычисляем среднее
+    average = total / numReadings;
+    
+    Serial.println(average);
     delay(100);
-}
-            </code></pre>
-        </div>
+}</code></pre>
+            </div>
 
-        <div class="template-card">
-            <h2>Сервопривод</h2>
-            <p>Управление сервоприводом</p>
-            <pre><code class="language-cpp">
-#include <Servo.h>
-
-Servo myservo;
-int pos = 0;
-
-void setup() {
-    myservo.attach(9);  // Подключаем сервопривод к пину 9
-}
-
-void loop() {
-    // Поворот от 0 до 180 градусов
-    for (pos = 0; pos <= 180; pos++) {
-        myservo.write(pos);
-        delay(15);
-    }
-    // Поворот от 180 до 0 градусов
-    for (pos = 180; pos >= 0; pos--) {
-        myservo.write(pos);
-        delay(15);
-    }
-}
-            </code></pre>
-        </div>
-
-        <div class="template-card">
-            <h2>LCD дисплей</h2>
-            <p>Вывод текста на LCD дисплей</p>
-            <pre><code class="language-cpp">
-#include <LiquidCrystal.h>
-
-// Инициализация пинов (RS, E, D4, D5, D6, D7)
-LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
-
-void setup() {
-    lcd.begin(16, 2);  // Размер дисплея 16x2
-    lcd.print("Hello, Arduino!");
-}
-
-void loop() {
-    lcd.setCursor(0, 1);  // Переход на вторую строку
-    lcd.print("Time: ");
-    lcd.print(millis() / 1000);
-    delay(1000);
-}
-            </code></pre>
-        </div>
-
-        <div class="template-card">
-            <h2>Ультразвуковой датчик расстояния</h2>
-            <p>Измерение расстояния с помощью HC-SR04</p>
-            <pre><code class="language-cpp">
-const int trigPin = 9;
-const int echoPin = 10;
+            <div class="template-card">
+                <h2>Таймер без delay()</h2>
+                <p>Шаблон для создания таймера без блокировки выполнения программы:</p>
+                <pre class="language-cpp"><code>unsigned long previousMillis = 0;  // Последнее время обновления
+const long interval = 1000;        // Интервал (миллисекунды)
 
 void setup() {
     Serial.begin(9600);
-    pinMode(trigPin, OUTPUT);
-    pinMode(echoPin, INPUT);
 }
 
 void loop() {
-    // Отправка ультразвукового сигнала
-    digitalWrite(trigPin, LOW);
-    delayMicroseconds(2);
-    digitalWrite(trigPin, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(trigPin, LOW);
-    
-    // Получение времени отклика
-    long duration = pulseIn(echoPin, HIGH);
-    
-    // Расчет расстояния
-    float distance = duration * 0.034 / 2;
-    
-    Serial.print("Расстояние: ");
-    Serial.print(distance);
-    Serial.println(" см");
-    
-    delay(500);
-}
-            </code></pre>
-        </div>
+    unsigned long currentMillis = millis();
 
-        <div class="template-card">
-            <h2>RGB светодиод</h2>
-            <p>Управление RGB светодиодом</p>
-            <pre><code class="language-cpp">
-const int redPin = 11;
-const int greenPin = 10;
-const int bluePin = 9;
+    if (currentMillis - previousMillis >= interval) {
+        previousMillis = currentMillis;
 
-void setup() {
-    pinMode(redPin, OUTPUT);
-    pinMode(greenPin, OUTPUT);
-    pinMode(bluePin, OUTPUT);
-}
-
-void loop() {
-    // Красный
-    setColor(255, 0, 0);
-    delay(1000);
-    
-    // Зеленый
-    setColor(0, 255, 0);
-    delay(1000);
-    
-    // Синий
-    setColor(0, 0, 255);
-    delay(1000);
-    
-    // Фиолетовый
-    setColor(255, 0, 255);
-    delay(1000);
-}
-
-void setColor(int red, int green, int blue) {
-    analogWrite(redPin, red);
-    analogWrite(greenPin, green);
-    analogWrite(bluePin, blue);
-}
-            </code></pre>
-        </div>
-
-        <div class="template-card">
-            <h2>Датчик температуры и влажности DHT11</h2>
-            <p>Считывание температуры и влажности</p>
-            <pre><code class="language-cpp">
-#include <DHT.h>
-
-#define DHTPIN 2
-#define DHTTYPE DHT11
-
-DHT dht(DHTPIN, DHTTYPE);
-
-void setup() {
-    Serial.begin(9600);
-    dht.begin();
-}
-
-void loop() {
-    delay(2000); // Ждем 2 секунды между измерениями
-    
-    float h = dht.readHumidity();
-    float t = dht.readTemperature();
-    
-    if (isnan(h) || isnan(t)) {
-        Serial.println("Ошибка чтения датчика!");
-        return;
+        // Здесь размещаем код, который должен 
+        // выполняться с заданным интервалом
+        Serial.println("Прошла 1 секунда");
     }
-    
-    Serial.print("Влажность: ");
-    Serial.print(h);
-    Serial.print("%\t");
-    Serial.print("Температура: ");
-    Serial.print(t);
-    Serial.println("°C");
-}
-            </code></pre>
-        </div>
+
+    // Здесь размещаем код, который должен 
+    // выполняться постоянно без задержек
+}</code></pre>
+            </div>
+        </section>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-c.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-cpp.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            Prism.highlightAll();
+        });
+    </script>
 </body>
 </html> 

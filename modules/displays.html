@@ -6,92 +6,161 @@
     <title>Дисплеи и индикация Arduino</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-okaidia.min.css" rel="stylesheet" />
+    <style>
+        pre[class*="language-"] {
+            padding: 1.5em;
+            margin: 1em 0;
+            font-size: 16px;
+            border-radius: 8px;
+            background: #e8e8e8 !important;  /* Более тёмный серый фон */
+            border: 1px solid #ddd;         /* Добавим тонкую рамку */
+        }
+        
+        code[class*="language-"] {
+            text-shadow: none;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            line-height: 1.5;
+            color: #333 !important;
+        }
+
+        /* Arduino IDE-like syntax highlighting */
+        .token.keyword {
+            color: #00979C !important;
+        }
+
+        .token.function {
+            color: #D35400 !important;
+        }
+
+        .token.number {
+            color: #00979C !important;
+        }
+
+        .token.comment {
+            color: #757575 !important;  /* Немного темнее для лучшей читаемости */
+        }
+
+        .token.string {
+            color: #7F8C8D !important;
+        }
+
+        .token.preprocessor {
+            color: #728E00 !important;
+        }
+
+        .token.constant {
+            color: #00979C !important;
+        }
+
+        .token.operator {
+            color: #434F54 !important;
+        }
+
+        .template-card {
+            background: #f8f9fa;
+            margin-bottom: 30px;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .template-card h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .template-card p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
     <header class="header">
+        <a href="../index.html" class="back-button">← Назад</a>
         <h1>Дисплеи и индикация</h1>
+        <p>Работа с различными типами дисплеев и индикаторов</p>
     </header>
 
     <div class="content">
-        <a href="../index.html" class="home-btn">На главную</a>
-
-        <div class="section">
+        <section>
             <h2>LCD дисплей (16x2)</h2>
-            <p>LCD дисплей 16x2 - это популярный способ отображения текстовой информации. Он может показывать 16 символов в 2 строках.</p>
+            <p>Базовый пример работы с LCD дисплеем:</p>
+            
             <div class="code-block">
-                <pre>
-#include <LiquidCrystal.h>
+                <h3>Вывод текста на LCD</h3>
+                <pre class="language-cpp"><code>#include <LiquidCrystal.h>
 
 // Инициализация пинов (RS, E, D4, D5, D6, D7)
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 void setup() {
-    lcd.begin(16, 2);  // Установка размера дисплея (16 символов, 2 строки)
-    lcd.print("Hello, Arduino!");  // Вывод текста
+    lcd.begin(16, 2);  // Размер дисплея 16x2
+    lcd.print("Hello, Arduino!");
 }
 
 void loop() {
-    lcd.setCursor(0, 1);  // Перемещение курсора на вторую строку
+    lcd.setCursor(0, 1);  // Переход на вторую строку
     lcd.print("Time: ");
-    lcd.print(millis() / 1000);  // Вывод времени работы в секундах
+    lcd.print(millis() / 1000);
+    lcd.print(" sec");
     delay(1000);
-}</pre>
+}</code></pre>
             </div>
-        </div>
 
-        <div class="section">
             <h2>7-сегментный индикатор</h2>
-            <p>7-сегментный индикатор позволяет отображать цифры и некоторые буквы с помощью семи светодиодных сегментов.</p>
+            <p>Управление 7-сегментным индикатором:</p>
+            
             <div class="code-block">
-                <pre>
-// Определение пинов для каждого сегмента (a-g)
-int segments[7] = {2, 3, 4, 5, 6, 7, 8};
+                <h3>Вывод цифр на индикатор</h3>
+                <pre class="language-cpp"><code>// Пины для сегментов (a-g)
+const int segmentPins[] = {2, 3, 4, 5, 6, 7, 8};
 
 // Массив для отображения цифр (0-9)
-byte numbers[10] = {
-    0b1111110,  // 0
-    0b0110000,  // 1
-    0b1101101,  // 2
-    0b1111001,  // 3
-    0b0110011,  // 4
-    0b1011011,  // 5
-    0b1011111,  // 6
-    0b1110000,  // 7
-    0b1111111,  // 8
-    0b1111011   // 9
+const byte digits[10][7] = {
+    {1,1,1,1,1,1,0},  // 0
+    {0,1,1,0,0,0,0},  // 1
+    {1,1,0,1,1,0,1},  // 2
+    {1,1,1,1,0,0,1},  // 3
+    {0,1,1,0,0,1,1},  // 4
+    {1,0,1,1,0,1,1},  // 5
+    {1,0,1,1,1,1,1},  // 6
+    {1,1,1,0,0,0,0},  // 7
+    {1,1,1,1,1,1,1},  // 8
+    {1,1,1,1,0,1,1}   // 9
 };
 
 void setup() {
+    // Настройка всех пинов как выходов
     for (int i = 0; i < 7; i++) {
-        pinMode(segments[i], OUTPUT);
-    }
-}
-
-void displayNumber(int num) {
-    if (num >= 0 && num <= 9) {
-        for (int i = 0; i < 7; i++) {
-            digitalWrite(segments[i], bitRead(numbers[num], i));
-        }
+        pinMode(segmentPins[i], OUTPUT);
     }
 }
 
 void loop() {
-    // Счет от 0 до 9
-    for (int i = 0; i < 10; i++) {
-        displayNumber(i);
+    // Отображение цифр от 0 до 9
+    for (int digit = 0; digit < 10; digit++) {
+        displayDigit(digit);
         delay(1000);
     }
-}</pre>
-            </div>
-        </div>
+}
 
-        <div class="section">
+void displayDigit(int digit) {
+    for (int i = 0; i < 7; i++) {
+        digitalWrite(segmentPins[i], digits[digit][i]);
+    }
+}</code></pre>
+            </div>
+
             <h2>OLED дисплей</h2>
-            <p>OLED дисплеи предоставляют возможность отображения графики и текста с высоким разрешением.</p>
+            <p>Работа с OLED дисплеем на базе SSD1306:</p>
+            
             <div class="code-block">
-                <pre>
+                <h3>Вывод текста и графики на OLED</h3>
+                <pre class="language-cpp"><code>#include <Wire.h>
+#include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <Wire.h>
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -100,103 +169,85 @@ void loop() {
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 void setup() {
-    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+    if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+        Serial.println("Ошибка инициализации дисплея");
+        for(;;);
+    }
+
     display.clearDisplay();
-    
     display.setTextSize(1);
     display.setTextColor(WHITE);
     display.setCursor(0,0);
-    display.println("OLED Display Test");
+    
+    // Вывод текста
+    display.println("Hello, Arduino!");
+    
+    // Рисование фигур
+    display.drawRect(0, 20, 40, 20, WHITE);
+    display.fillCircle(80, 30, 10, WHITE);
+    
     display.display();
 }
 
 void loop() {
-    // Рисование прямоугольника
-    display.clearDisplay();
-    display.drawRect(10, 10, 50, 30, WHITE);
-    display.display();
+    // Анимация точки
+    for(int i = 0; i < SCREEN_WIDTH; i++) {
+        display.clearDisplay();
+        display.drawPixel(i, 32, WHITE);
+        display.display();
+        delay(50);
+    }
+}</code></pre>
+            </div>
+
+            <h2>Матрица светодиодов 8x8</h2>
+            <p>Управление светодиодной матрицей через MAX7219:</p>
+            
+            <div class="code-block">
+                <h3>Бегущая строка на матрице</h3>
+                <pre class="language-cpp"><code>#include <LedControl.h>
+
+// Пины подключения: DIN, CLK, CS, количество устройств
+LedControl lc = LedControl(12, 11, 10, 1);
+
+// Определение символа "A" (5x7)
+byte A[5] = {
+    B01110000,
+    B10001000,
+    B11111000,
+    B10001000,
+    B10001000
+};
+
+void setup() {
+    lc.shutdown(0, false);  // Включаем матрицу
+    lc.setIntensity(0, 8);  // Устанавливаем яркость (0-15)
+    lc.clearDisplay(0);     // Очищаем дисплей
+}
+
+void loop() {
+    // Отображаем букву "A"
+    for(int col = 0; col < 5; col++) {
+        lc.setColumn(0, col, A[col]);
+    }
     delay(1000);
     
-    // Рисование круга
-    display.clearDisplay();
-    display.drawCircle(64, 32, 20, WHITE);
-    display.display();
+    // Очищаем дисплей
+    lc.clearDisplay(0);
     delay(1000);
-}</pre>
+}</code></pre>
             </div>
-        </div>
-
-        <div class="test-container">
-            <h2>Проверьте свои знания</h2>
-            <div class="question">
-                <p>1. Сколько символов может отображать стандартный LCD дисплей 16x2?</p>
-                <div class="options">
-                    <label>
-                        <input type="radio" name="q1" value="1"> 16 символов в одну строку
-                    </label>
-                    <label>
-                        <input type="radio" name="q1" value="2"> 32 символа (16 символов в 2 строки)
-                    </label>
-                    <label>
-                        <input type="radio" name="q1" value="3"> 64 символа
-                    </label>
-                </div>
-            </div>
-
-            <div class="question">
-                <p>2. Сколько сегментов имеет 7-сегментный индикатор?</p>
-                <div class="options">
-                    <label>
-                        <input type="radio" name="q2" value="1"> 6 сегментов
-                    </label>
-                    <label>
-                        <input type="radio" name="q2" value="2"> 7 сегментов
-                    </label>
-                    <label>
-                        <input type="radio" name="q2" value="3"> 8 сегментов
-                    </label>
-                </div>
-            </div>
-
-            <div class="question">
-                <p>3. Какое преимущество имеет OLED дисплей?</p>
-                <div class="options">
-                    <label>
-                        <input type="radio" name="q3" value="1"> Возможность отображения только текста
-                    </label>
-                    <label>
-                        <input type="radio" name="q3" value="2"> Возможность отображения графики и текста с высоким разрешением
-                    </label>
-                    <label>
-                        <input type="radio" name="q3" value="3"> Работает только с цифрами
-                    </label>
-                </div>
-            </div>
-
-            <button class="submit-btn" onclick="checkAnswers()">Проверить ответы</button>
-        </div>
+        </section>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-cpp.min.js"></script>
     <script>
-        function checkAnswers() {
-            const correctAnswers = {
-                q1: "2",
-                q2: "2",
-                q3: "2"
-            };
-
-            let score = 0;
-            let total = Object.keys(correctAnswers).length;
-
-            for (let question in correctAnswers) {
-                const selected = document.querySelector(`input[name="${question}"]:checked`);
-                if (selected && selected.value === correctAnswers[question]) {
-                    score++;
-                }
-            }
-
-            alert(`Ваш результат: ${score} из ${total} правильных ответов`);
-        }
+        document.addEventListener('DOMContentLoaded', (event) => {
+            Prism.highlightAll();
+        });
     </script>
 </body>
 </html> 
