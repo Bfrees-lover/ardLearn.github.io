@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шаблоны кода Arduino</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css">
+</head>
+<body>
+    <header class="header">
+        <a href="../index.html" class="back-button">← Назад</a>
+        <h1>Шаблоны кода Arduino</h1>
+        <p>Готовые примеры кода для типовых задач</p>
+    </header>
+
+    <div class="code-templates">
+        <div class="template-card">
+            <h2>Мигающий светодиод (Blink)</h2>
+            <p>Базовый пример работы со светодиодом</p>
+            <pre><code class="language-cpp">
+void setup() {
+    pinMode(13, OUTPUT);    // Установка пина 13 как выход
+}
+
+void loop() {
+    digitalWrite(13, HIGH); // Включить светодиод
+    delay(1000);           // Ждать 1 секунду
+    digitalWrite(13, LOW);  // Выключить светодиод
+    delay(1000);           // Ждать 1 секунду
+}
+            </code></pre>
+        </div>
+
+        <div class="template-card">
+            <h2>Кнопка и светодиод</h2>
+            <p>Управление светодиодом с помощью кнопки</p>
+            <pre><code class="language-cpp">
+const int buttonPin = 2;    // Пин кнопки
+const int ledPin = 13;      // Пин светодиода
+int buttonState = 0;        // Состояние кнопки
+
+void setup() {
+    pinMode(ledPin, OUTPUT);
+    pinMode(buttonPin, INPUT);
+}
+
+void loop() {
+    buttonState = digitalRead(buttonPin);
+    if (buttonState == HIGH) {
+        digitalWrite(ledPin, HIGH);
+    } else {
+        digitalWrite(ledPin, LOW);
+    }
+}
+            </code></pre>
+        </div>
+
+        <div class="template-card">
+            <h2>Аналоговое чтение</h2>
+            <p>Чтение данных с аналогового датчика</p>
+            <pre><code class="language-cpp">
+const int sensorPin = A0;   // Аналоговый пин датчика
+int sensorValue = 0;        // Значение с датчика
+
+void setup() {
+    Serial.begin(9600);     // Инициализация Serial порта
+}
+
+void loop() {
+    sensorValue = analogRead(sensorPin);
+    Serial.println(sensorValue);
+    delay(100);
+}
+            </code></pre>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-cpp.min.js"></script>
+</body>
+</html> 
