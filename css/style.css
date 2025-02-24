@@ -226,3 +226,8 @@ body {
         transform: translateY(-7px);
     }
 }
+
+.modules-container a .lightning {
+    text-decoration: none;
+    display: block;
+}
